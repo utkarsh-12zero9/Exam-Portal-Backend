@@ -1,0 +1,51 @@
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import healthRoute from './routes/health.js';
+
+const app = express();
+
+// Global Middlewares
+app.use(cors({
+  origin: '*', // We can restrict this later to the actual frontend port
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Request logging in development mode
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
+
+// Routes registration
+app.use('/api/health', healthRoute);
+
+// Root index fallback route
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Welcome to the Online Exam Portal REST API. Please use /api/health to check API status.',
+  });
+});
+
+// 404 - Not Found Handler
+app.use((req, res, next) => {
+  res.status(404).json({
+    success: false,
+    error: 'API Endpoint Not Found',
+  });
+});
+
+// Global Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error('💥 Server Error:', err.stack || err.message);
+
+  res.status(err.status || 500).json({
+    success: false,
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error',
+  });
+});
+
+export default app;
