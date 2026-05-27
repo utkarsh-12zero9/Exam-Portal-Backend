@@ -2,6 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import healthRoute from './routes/health.js';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import courseRoutes from './routes/courseRoutes.js';
+import moduleRoutes from './routes/moduleRoutes.js';
+import questionRoutes from './routes/questionRoutes.js';
+import enrollmentRoutes from './routes/enrollmentRoutes.js';
 
 const app = express();
 
@@ -22,6 +28,12 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Routes registration
 app.use('/api/health', healthRoute);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/modules', moduleRoutes);
+app.use('/api/questions', questionRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
 
 // Root index fallback route
 app.get('/', (req, res) => {
