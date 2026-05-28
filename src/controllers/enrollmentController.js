@@ -102,7 +102,12 @@ export const enrollInCourse = async (req, res, next) => {
 // @access  Private
 export const getMyEnrollments = async (req, res, next) => {
   try {
-    const enrollments = await Enrollment.find({ userId: req.user._id });
+    let enrollments;
+    if (req.user && req.user.role === 'admin') {
+      enrollments = await Enrollment.find({});
+    } else {
+      enrollments = await Enrollment.find({ userId: req.user._id });
+    }
     
     const formatted = await Promise.all(
       enrollments.map(enrollment => formatEnrollment(enrollment))
