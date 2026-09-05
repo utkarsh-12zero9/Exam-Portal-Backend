@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -12,18 +13,21 @@ import enrollmentRoutes from './routes/enrollmentRoutes.js';
 const app = express();
 
 // Global Middlewares
-const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://localhost:3000')
-  .split(',')
-  .map((origin) => origin.trim())
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://online-exam-de.vercel.app',
+  ...(process.env.CORS_ORIGINS || '').split(','),
+].map((origin) => origin.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
       return callback(null, true);
     }
 
-    return callback(new Error('Origin is not allowed by CORS'));
+    return callback(null, false);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
